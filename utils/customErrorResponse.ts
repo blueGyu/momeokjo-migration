@@ -1,8 +1,8 @@
-interface CustomErrorInterface {
+type CustomErrorParams = {
   message: string;
   status?: number;
   target?: string;
-}
+};
 
 class CustomError extends Error {
   constructor(message: string, public status = 500, public target?: string) {
@@ -13,7 +13,7 @@ class CustomError extends Error {
   }
 }
 
-const customErrorResponse = ({ message, status, target }: CustomErrorInterface) => {
+const customErrorResponse = ({ message, status, target }: CustomErrorParams) => {
   return new CustomError(message, status, target);
 };
 
