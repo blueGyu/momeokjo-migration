@@ -1,4 +1,4 @@
-module.exports = {
+const regexConfig = {
   ID: /^[A-Za-z0-9]{1,50}$/,
   PW: /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+\[\]{}|;:'",.<>?/])[A-Za-z\d!@#$%^&*()\-_=+\[\]{}|;:'",.<>?/]{8,32}$/,
   NICKNAME: /^[가-힣a-zA-Z0-9]{1,50}$/,
@@ -19,3 +19,5 @@ module.exports = {
   MENU_NAME: /^.{1,20}$/,
   MENU_PRICE: /^\d+$/,
 };
+
+export default regexConfig;
