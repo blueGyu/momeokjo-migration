@@ -2,14 +2,15 @@ import { NextFunction } from "express";
 import { Pool, PoolClient } from "pg";
 
 // 일반 wrapper 타입
-type AsyncRequestHandler = {
-  (req: Request, res: Response, next: NextFunction): Promise<void>;
-};
+type AsyncRequestHandler = (req: Request, res: Response, next: NextFunction) => Promise<void>;
 
 // 데이터베이스 작업이 필요한 경우 사용할 wrapper 타입
-type AsyncRequestHandlerWithDb = {
-  (req: Request, res: Response, next: NextFunction, client: PoolClient): Promise<void>;
-};
+type AsyncRequestHandlerWithDb = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  client: PoolClient
+) => Promise<void>;
 
 // 일반 wrapper
 export const tryCatchWrapper =
