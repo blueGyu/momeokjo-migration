@@ -1,4 +1,4 @@
-import { NextFunction } from "express";
+import { Request, Response, NextFunction } from "express";
 import { Pool, PoolClient } from "pg";
 
 // 일반 wrapper 타입
