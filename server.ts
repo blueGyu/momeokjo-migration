@@ -1,6 +1,9 @@
 // 환경설정
 import dotenv from "dotenv";
-dotenv.config();
+dotenv.config({
+  path: `${__dirname}/.env.${process.env.NODE_ENV}`,
+});
+import "./config/env";
 
 // 외부 라이브러리
 import express from "express";
