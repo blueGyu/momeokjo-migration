@@ -12,8 +12,8 @@ const _env = z.object({
   // JWT
   JWT_ACCESS_SECRET: z.string(),
   JWT_REFRESH_SECRET: z.string(),
-  JWT_ACCESS_EXPIRES_IN: z.string().default("15"),
-  JWT_REFRESH_EXPIRES_IN: z.string().default("30"),
+  JWT_ACCESS_EXPIRES_IN: z.string().default("15m"),
+  JWT_REFRESH_EXPIRES_IN: z.string().default("30d"),
 
   // NODEMAIL
   EMAIL_USER: z.string(),
