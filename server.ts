@@ -1,9 +1,5 @@
 // 환경설정
-import dotenv from "dotenv";
-dotenv.config({
-  path: `${__dirname}/.env.${process.env.NODE_ENV}`,
-});
-import "./config/env";
+import env from "./config/env";
 
 // 외부 라이브러리
 import express from "express";
@@ -24,7 +20,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: env.FRONT_URL,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })

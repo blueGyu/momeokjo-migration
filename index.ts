@@ -1,6 +1,7 @@
+import env from "./config/env";
 import app from "./server";
 
-const port = parseInt(process.env.PORT ?? "8000");
+const port = parseInt(env.PORT);
 app.listen(port, "0.0.0.0", () => {
   console.log(`Server is running on port: ${port}`);
 });

@@ -1,6 +1,12 @@
+import { config } from "dotenv";
+config({
+  path: `${process.cwd()}/.env.${process.env.NODE_ENV}`,
+});
+
 import { z } from "zod";
 
 const _env = z.object({
+  NODE_ENV: z.string().default("local"),
   PORT: z.string().default("8000"),
 
   // AWS S3
@@ -30,6 +36,8 @@ const _env = z.object({
 
   // COOKIE
   FRONT_URL: z.string(),
+  COOKIE_SHORT_EXPIRES_IN: z.string().default("15"),
+  COOKIE_LONG_EXPIRES_IN: z.string().default("30"),
 
   // DATABASE
   DB_HOST: z.string(),
