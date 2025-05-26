@@ -1,9 +1,3 @@
-type CustomErrorParams = {
-  message: string;
-  status?: number;
-  target?: string;
-};
-
 class CustomError extends Error {
   constructor(message: string, public status = 500, public target?: string) {
     super(message);
@@ -13,7 +7,7 @@ class CustomError extends Error {
   }
 }
 
-const customErrorResponse = ({ message, status, target }: CustomErrorParams) => {
+const customErrorResponse = (message: string, status?: number, target?: string) => {
   return new CustomError(message, status, target);
 };
 
