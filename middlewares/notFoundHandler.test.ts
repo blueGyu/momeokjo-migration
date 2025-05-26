@@ -1,12 +1,13 @@
-const notFoundHandler = require("./notFoundHandler");
+import { Request, Response, NextFunction } from "express";
+import notFoundHandler from "./notFoundHandler";
 
 it("호출된 url이 없으면 notFoundHandler가 응답해야한다.", () => {
-  const req = {};
+  const req = {} as Request;
   const res = {
     status: jest.fn().mockReturnThis(),
     json: jest.fn(),
-  };
-  const next = jest.fn();
+  } as unknown as Response;
+  const next = jest.fn() as NextFunction;
 
   notFoundHandler(req, res, next);
 
