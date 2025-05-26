@@ -7,19 +7,17 @@ import {
   verifyRefreshToken,
 } from "./token";
 
-jest.mock("../config/env", () => ({
-  JWT_ACCESS_SECRET: "access_secret",
-  JWT_ACCESS_EXPIRES_IN: "15m",
-  JWT_REFRESH_SECRET: "refresh_secret",
-  JWT_REFRESH_EXPIRES_IN: "30d",
-}));
+let originEnv: typeof env;
+beforeEach(() => {
+  originEnv = { ...env };
+});
+
+afterEach(() => {
+  Object.assign(env, originEnv);
+  jest.restoreAllMocks();
+});
 
 describe("generateAccessToken", () => {
-  afterEach(() => {
-    env.JWT_ACCESS_SECRET = "access_secret";
-    jest.restoreAllMocks();
-  });
-
   it("payload, 환경 변수가 유효한 경우 토큰을 생성해야한다.", () => {
     const { success, data, message } = generateAccessToken({ id: 1 });
 
@@ -36,7 +34,7 @@ describe("generateAccessToken", () => {
     expect(message).toBe("payload 확인 필요");
   });
 
-  it("payload가 유효하지만 비밀키가 유효하지 않은 경우 오류 메시지를 반환해야한다.", () => {
+  it("payload가 유효하지만 비밀키가 유효하지 않은 경우 오류 메시지를 반환해야한다.", async () => {
     env.JWT_ACCESS_SECRET = "";
 
     const { success, data, message } = generateAccessToken({ id: 1 });
@@ -73,11 +71,6 @@ describe("generateAccessToken", () => {
 });
 
 describe("generateRefreshToken", () => {
-  afterEach(() => {
-    env.JWT_REFRESH_SECRET = "refresh_secret";
-    jest.restoreAllMocks();
-  });
-
   it("payload, 환경 변수가 유효한 경우 토큰을 생성해야한다.", () => {
     const { success, data, message } = generateRefreshToken({ id: 1 });
 
@@ -131,15 +124,11 @@ describe("generateRefreshToken", () => {
 });
 
 describe("verifyAccessToken", () => {
-  const dummyPayload = { id: 1 };
-  const { data: validToken } = generateAccessToken(dummyPayload);
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it("유효한 토크인 경우 검증된 값을 응답해야한다.", () => {
-    const { success, data, message } = verifyAccessToken(validToken as string);
+    const dummyPayload = { id: 1 };
+    const accessToken = generateAccessToken(dummyPayload);
+
+    const { success, data, message } = verifyAccessToken(accessToken.data as string);
 
     expect(success).toBe(true);
     expect(data).toMatchObject(dummyPayload);
@@ -210,15 +199,11 @@ describe("verifyAccessToken", () => {
 });
 
 describe("verifyRefreshToken", () => {
-  const dummyPayload = { id: 1 };
-  const { data: validToken } = generateRefreshToken(dummyPayload);
-
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   it("유효한 토크인 경우 검증된 값을 응답해야한다.", () => {
-    const { success, data, message } = verifyRefreshToken(validToken as string);
+    const dummyPayload = { id: 1 };
+    const refreshToken = generateRefreshToken(dummyPayload);
+
+    const { success, data, message } = verifyRefreshToken(refreshToken.data as string);
 
     expect(success).toBe(true);
     expect(data).toMatchObject(dummyPayload);
