@@ -13,11 +13,11 @@ const validInput = <T extends z.ZodRawShape>(
     const parse = schema.safeParse(input);
 
     if (!parse.success) {
-      throw customErrorResponse({
-        message: `Invalid request ${target}`,
-        status: 400,
-        target: parse.error.errors[0]?.path[0] as string,
-      });
+      throw customErrorResponse(
+        `Invalid request ${target}`,
+        400,
+        parse.error.errors[0]?.path[0] as string
+      );
     }
 
     next();
