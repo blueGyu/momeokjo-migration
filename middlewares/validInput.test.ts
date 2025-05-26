@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import validInput from "../middlewares/validInput";
-import customErrorResponse from "../utils/customErrorResponse";
 
 describe("validInput middleware", () => {
   const schema = z.object({
