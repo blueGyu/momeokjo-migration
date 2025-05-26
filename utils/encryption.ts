@@ -10,9 +10,9 @@ import {
   DecipherCCM,
 } from "crypto";
 
-const algorithm = env.ALGORITHM_WAY;
-const ivLength = parseInt(env.ALGORITHM_IV_LENGTH);
-const password = env.ALGORITHM_SECRET;
+const algorithm = env.ENCRYPTION_WAY;
+const ivLength = parseInt(env.ENCRYPTION_IV_LENGTH);
+const password = env.ENCRYPTION_SECRET;
 
 const scrypt = promisify(_scrypt);
 const randomBytes = promisify(_randomBytes);

@@ -30,9 +30,9 @@ const _env = z.object({
   KAKAO_REDIRECT_URI: z.string(),
 
   // ALGORITHM
-  ALGORITHM_SECRET: z.string(),
-  ALGORITHM_WAY: z.string(),
-  ALGORITHM_IV_LENGTH: z.string(),
+  ENCRYPTION_SECRET: z.string(),
+  ENCRYPTION_WAY: z.string().default("aes-256-gcm"),
+  ENCRYPTION_IV_LENGTH: z.string().default("12"),
 
   // COOKIE
   FRONT_URL: z.string(),
