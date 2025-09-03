@@ -1,7 +1,20 @@
+# 의존성 파일
 node_modules
+
+# 환경 변수
 .env
+.*.env
+
+# os 로컬 파일
 .DS_Store
+
+# 테스트
 coverage
+
+# 빌드
 dist
 
 /database/config.js
+/generated/prisma
+
+/src/generated/prisma
