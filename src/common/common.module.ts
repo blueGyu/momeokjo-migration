@@ -4,6 +4,7 @@ import { AuthGuard } from "./guards/auth.guard";
 import { PasswordResetGuard } from "./guards/password-reset.guard";
 import { EmailVerificationGuard } from "./guards/email-verification.guard";
 import { CryptoService } from "./utils/crypto.util";
+import { EmailService } from "./utils/email.service";
 import { HttpExceptionFilter } from "./filters/http-exception.filter";
 import { PrismaExceptionFilter } from "./filters/prisma-exception.filter";
 
@@ -13,6 +14,7 @@ import { PrismaExceptionFilter } from "./filters/prisma-exception.filter";
     EmailVerificationGuard,
     PasswordResetGuard,
     CryptoService,
+    EmailService,
     HttpExceptionFilter,
     PrismaExceptionFilter,
     {
@@ -29,6 +31,7 @@ import { PrismaExceptionFilter } from "./filters/prisma-exception.filter";
     EmailVerificationGuard,
     PasswordResetGuard,
     CryptoService,
+    EmailService,
   ],
 })
 export class CommonModule {}

@@ -17,6 +17,8 @@ const validateSchema = z.object({
   EMAIL_VERIFICATION_EXPIRES_IN: z.string(),
   PASSWORD_RESET_SECRET: z.string(),
   PASSWORD_RESET_EXPIRES_IN: z.string(),
+  EMAIL_USER: z.string(),
+  EMAIL_PASS: z.string(),
 });
 
 @Module({
