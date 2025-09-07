@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   ACCESS_TOKEN: "accessToken",
   REFRESH_TOKEN: "refreshToken",
   EMAIL_AUTH_SEND: "emailAuthSend",
