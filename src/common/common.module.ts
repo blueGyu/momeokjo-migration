@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { APP_FILTER } from "@nestjs/core";
 import { AuthGuard } from "./guards/auth.guard";
+import { AuthOptionalGuard } from "./guards/auth-optional.guard";
 import { PasswordResetGuard } from "./guards/password-reset.guard";
 import { EmailVerificationGuard } from "./guards/email-verification.guard";
 import { CryptoService } from "./utils/crypto.service";
@@ -11,6 +12,7 @@ import { PrismaExceptionFilter } from "./filters/prisma-exception.filter";
 @Module({
   providers: [
     AuthGuard,
+    AuthOptionalGuard,
     EmailVerificationGuard,
     PasswordResetGuard,
     CryptoService,
@@ -28,6 +30,7 @@ import { PrismaExceptionFilter } from "./filters/prisma-exception.filter";
   ],
   exports: [
     AuthGuard,
+    AuthOptionalGuard,
     EmailVerificationGuard,
     PasswordResetGuard,
     CryptoService,
