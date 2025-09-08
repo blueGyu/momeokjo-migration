@@ -4,6 +4,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { z } from "zod";
+import { UsersModule } from "./domains/users/users.module";
 
 const validateSchema = z.object({
   DATABASE_URL: z.string(),
@@ -44,6 +45,7 @@ const validateSchema = z.object({
         },
       }),
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
