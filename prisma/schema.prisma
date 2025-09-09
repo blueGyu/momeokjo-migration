@@ -4,21 +4,350 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
+// 1. 기본 설정
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis]
 }
 
-// 임시 모델
+// 2. Enum 타입 설정
+enum Role {
+  USER
+  ADMIN
+}
+
+// 3. 모델 설정
+// 사용자 모델(관리자 포함)
 model User {
-  idx Int @id @default(autoincrement())
-  name String
-  id String @unique
-  password String
+  idx       BigInt   @id @default(autoincrement())
+  id        String?  @unique
+  pw        String?
+  role      Role     @default(USER)
+  email     String   @unique
+  nickname  String   @unique
+  isDeleted Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // --- Relations --- //
+  // Oauth
+  oauth Oauth[]
+
+  // UserReport
+  sentReports     UserReport[] @relation("sentReports")
+  receivedReports UserReport[] @relation("receivedReports")
+
+  // Restaurant
+  restaurant Restaurant[]
+
+  // Category
+  createdCategory Category[] @relation("creator")
+  updatedCategory Category[] @relation("updater")
+
+  // RestaurantLike
+  restaurantLike RestaurantLike[]
+
+  // RestaurantReport
+  restaurantReport RestaurantReport[]
+
+  // Menu
+  menu Menu[]
+
+  // MenuLike
+  menuLike MenuLike[]
+
+  // MenuReport
+  menuReport MenuReport[]
+
+  // Review
+  review Review[]
+
+  // ReviewLike
+  reviewLike ReviewLike[]
+
+  // ReviewReport
+  reviewReport ReviewReport[]
+}
+
+// Oauth 모델
+model Oauth {
+  idx                   BigInt   @id @default(autoincrement())
+  provider              String
+  providerUserId        String
+  refreshToken          String
+  refreshTokenExpiresIn BigInt
+  accessToken           String
+  isDeleted             Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // relations
+  // User
+  user    User   @relation(fields: [userIdx], references: [idx])
+  userIdx BigInt
+
+  // --- Constraints --- //
+  @@unique([provider, providerUserId], name: "unique_oauth")
+  @@unique([provider, userIdx], name: "unique_oauth_user")
+}
+
+// 사용자 신고 모델
+model UserReport {
+  idx       BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relations --- //
+  // User
+  fromUser    User   @relation(name: "sentReports", fields: [fromUserIdx], references: [idx])
+  fromUserIdx BigInt
+  toUser      User   @relation(name: "receivedReports", fields: [toUserIdx], references: [idx])
+  toUserIdx   BigInt
+
+  // --- Constraints --- //
+  @@unique([fromUserIdx, toUserIdx], name: "unique_user_report")
+}
+
+// 이메일 인증번호 모델
+model Code {
+  idx       BigInt   @id @default(autoincrement())
+  email     String
+  code      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 음식점 모델
+model Restaurant {
+  idx           BigInt                                @id @default(autoincrement())
+  name          String
+  location      Unsupported("geography(point, 4326)")
+  address       String
+  addressDetail String?
+  phone         String?
+  openTime      DateTime?
+  closeTime     DateTime?
+  isDeleted     Boolean                               @default(false)
+  createdAt     DateTime                              @default(now())
+  updatedAt     DateTime                              @updatedAt
+
+  // --- Relations --- //
+  // User
+  creator    User   @relation(fields: [creatorIdx], references: [idx])
+  creatorIdx BigInt
+
+  // Category
+  category    Category @relation(fields: [categoryIdx], references: [idx])
+  categoryIdx BigInt
+
+  // RestaurantLike
+  restaurantLike RestaurantLike[]
+
+  // RestaurantReport
+  restaurantReport RestaurantReport[]
+
+  // Menu
+  menu Menu[]
+
+  // Review
+  review Review[]
+}
+
+// 음식점 카테고리 모델
+model Category {
+  idx       BigInt   @id @default(autoincrement())
+  name      String   @unique
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relations --- //
+  // User
+  creator    User   @relation(name: "creator", fields: [creatorIdx], references: [idx])
+  creatorIdx BigInt
+  updater    User   @relation(name: "updater", fields: [updaterIdx], references: [idx])
+  updaterIdx BigInt
+
+  // Restaurant
+  restaurant Restaurant[]
+}
+
+// 음식점 찜 모델
+model RestaurantLike {
+  idx       BigInt   @id @default(autoincrement())
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relations --- //
+  // User
+  creator    User   @relation(fields: [creatorIdx], references: [idx])
+  creatorIdx BigInt
+
+  // Restaurant
+  restaurant    Restaurant @relation(fields: [restaurantIdx], references: [idx])
+  restaurantIdx BigInt
+
+  @@unique([creatorIdx, restaurantIdx], name: "unique_restaurant_like")
+}
+
+// 음식점 신고 모델
+model RestaurantReport {
+  idx       BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relations --- //
+  // User
+  reporter    User   @relation(fields: [reporterIdx], references: [idx])
+  reporterIdx BigInt
+
+  // Restaurant
+  restaurant    Restaurant @relation(fields: [restaurantIdx], references: [idx])
+  restaurantIdx BigInt
+
+  @@unique([reporterIdx, restaurantIdx], name: "unique_restaurant_report")
+}
+
+// 메뉴 모델
+model Menu {
+  idx       BigInt   @id @default(autoincrement())
+  name      String
+  price     Int
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relations --- //
+  // User
+  creator    User   @relation(fields: [creatorIdx], references: [idx])
+  creatorIdx BigInt
+
+  // Restaurant
+  restaurant    Restaurant @relation(fields: [restaurantIdx], references: [idx])
+  restaurantIdx BigInt
+
+  // MenuLike 
+  menuLike MenuLike[]
+
+  // MenuReport
+  menuReport MenuReport[]
+
+  // Review
+  review Review[]
+}
+
+// 메뉴 좋아요 모델
+model MenuLike {
+  idx       BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relations --- //
+  // User
+  creator    User   @relation(fields: [creatorIdx], references: [idx])
+  creatorIdx BigInt
+
+  // Menu
+  menu    Menu   @relation(fields: [menuIdx], references: [idx])
+  menuIdx BigInt
+
+  // --- Constraints --- //
+  @@unique([creatorIdx, menuIdx], name: "unique_menu_like")
+}
+
+// 메뉴 신고 모델
+model MenuReport {
+  idx       BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relations --- //
+  // User
+  reporter    User   @relation(fields: [reporterIdx], references: [idx])
+  reporterIdx BigInt
+
+  // Menu
+  menu    Menu   @relation(fields: [menuIdx], references: [idx])
+  menuIdx BigInt
+
+  // --- Constraints --- //
+  @@unique([reporterIdx, menuIdx], name: "unique_menu_report")
+}
+
+// 후기 모델
+model Review {
+  idx       BigInt   @id @default(autoincrement())
+  content   String
+  imageUrl  String?
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relations --- //
+  // User
+  author        User   @relation(fields: [authorIdx], references: [idx])
+  authorIdx BigInt
+
+  // Restaurant
+  restaurant    Restaurant @relation(fields: [restaurantIdx], references: [idx])
+  restaurantIdx BigInt
+
+  // Menu
+  menu    Menu   @relation(fields: [menuIdx], references: [idx])
+  menuIdx BigInt
+
+  // ReviewLike
+  reviewLike ReviewLike[]
+
+  // ReviewReport
+  reviewReport ReviewReport[]
+
+  // --- Constraints --- //
+  @@unique([authorIdx, restaurantIdx, menuIdx], name: "unique_review")
+}
+
+// 후기 좋아요 모델
+model ReviewLike {
+  idx       BigInt   @id @default(autoincrement())
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relations --- //
+  // User
+  creator    User   @relation(fields: [creatorIdx], references: [idx])
+  creatorIdx BigInt
+
+  // Review
+  review    Review @relation(fields: [reviewIdx], references: [idx])
+  reviewIdx BigInt
+
+  // --- Constraints --- //
+  @@unique([creatorIdx, reviewIdx], name: "unique_review_like")
+}
+
+// 후기 신고 모델
+model ReviewReport {
+  idx       BigInt   @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // --- Relations --- //
+  // User
+  reporter    User   @relation(fields: [reporterIdx], references: [idx])
+  reporterIdx BigInt
+
+  // Review
+  review    Review @relation(fields: [reviewIdx], references: [idx])
+  reviewIdx BigInt
+
+  // --- Constraints --- //
+  @@unique([reporterIdx, reviewIdx], name: "unique_review_report")
 }
